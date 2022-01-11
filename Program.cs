@@ -1,48 +1,103 @@
-﻿using System.Reflection;
-using Amazon.SimpleNotificationService;
-using Amazon.SimpleNotificationService.Model;
-using EventViewer.Pipeline;
-using McMaster.Extensions.CommandLineUtils;
+﻿// <copyright file="Program.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
-namespace EventViewer {
+namespace EventViewer
+{
+    using Amazon.SimpleNotificationService;
+    using Amazon.SQS;
+    using EventViewer.Pipeline;
+    using McMaster.Extensions.CommandLineUtils;
+
+    /// <summary>
+    /// CommandOption.
+    /// </summary>
+    public enum CommandOption
+    {
+        /// <summary>
+        /// Lists topics.
+        /// </summary>
+        ListTopics,
+
+        /// <summary>
+        /// Subscribes topics to queue.
+        /// </summary>
+        Subscribe,
+
+        /// <summary>
+        /// Listens to queue.
+        /// </summary>
+        Listen,
+
+        /// <summary>
+        /// Unsubscribes topics to queue.
+        /// </summary>
+        Unsubscribe,
+
+        /// <summary>
+        /// Help.
+        /// </summary>
+        Help,
+    }
+
+    /// <summary>
+    /// Program.
+    /// </summary>
     internal class Program
     {
-
+        /// <summary>
+        /// Main Program.
+        /// </summary>
         public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
 
-        [Argument(0, Description = @"Command.
-        ListTopics -> find topics,
-        Subscribe --topic-arn <arn> -> To add topic to listening list
-        Unsubscribe --topic-arn <arn> -> To remove topic to listening list
-        Listen to display incomming events"
-        )]
-        public string Command { get; }
+        /// <summary>
+        /// Gets Command.
+        /// </summary>
+        [Argument(0, Description = "Command one of [ListTopics, Subscribe --topic-arn, Unsubscribe --topic-arn, Listen")]
+        public CommandOption Command { get; } = default!;
 
+        /// <summary>
+        /// Gets Topic Arn.
+        /// </summary>
         [Option("--topic-arn", Description = "Topic arn")]
-        public string TopicArn { get; }
+        public string TopicArn { get; } = default!;
 
+        /// <summary>
+        /// Gets EndpointUrl.
+        /// </summary>
         [Option("--endpoint-url", Description = "Aws endpoint url")]
         public string EndpointUrl { get; } = "http://localhost:4566";
 
-        private async Task<int> OnExecuteAsync(CommandLineApplication app, CancellationToken cancellationToken = default)
+        private async Task<int> OnExecuteAsync(CommandLineApplication app,
+                                               CancellationToken cancellationToken = default)
         {
-            var client = AmazonSimpleNotificationServiceClient(EndpointUrl);
-            var queue = Queue.Create("DevListener");
+            var snsClient = new AmazonSimpleNotificationServiceClient(
+                new AmazonSimpleNotificationServiceConfig
+                {
+                    ServiceURL = this.EndpointUrl,
+                });
+            var sqsClient = new AmazonSQSClient(
+                new AmazonSQSConfig
+                {
+                    ServiceURL = this.EndpointUrl,
+                });
+            var queueUrl = await PipelineQueue.CreateAsync(sqsClient, "DevListener");
 
-            switch (Command)
+            switch (this.Command)
             {
                 case CommandOption.ListTopics:
-                    await Topic.ListTopicsAsync(client);
+                    await PipelineTopic.ListTopicsAsync(snsClient);
                     break;
                 case CommandOption.Subscribe:
-                    await Topic.SubscribeAsync(client, topicArn, queueUrl);
+                    await PipelineTopic.SubscribeQueueAsync(snsClient, this.TopicArn, queueUrl);
                     break;
                 case CommandOption.Unsubscribe:
-                    var response = await Topic.SubscribeAsync(client, topicArn, queueUrl);
+                    var response = await PipelineTopic.SubscribeQueueAsync(snsClient, this.TopicArn, queueUrl);
                     string subscriptionArn = response.SubscriptionArn;
-                    await Topic.UnsubscribeAsync(client, subscriptionArn);
+                    await PipelineTopic.UnsubscribeAsync(snsClient, subscriptionArn);
                     break;
                 case CommandOption.Listen:
+                    await PipelineQueue.ListenToSqsQueue(sqsClient, queueUrl);
                     break;
                 case CommandOption.Help:
                     app.ShowHelp();
@@ -54,14 +109,5 @@ namespace EventViewer {
 
             return 0;
         }
-    }
-
-    public enum CommandOption
-    {
-        ListTopics,
-        Subscribe,
-        Listen,
-        Unsubscribe,
-        Help,
     }
 }

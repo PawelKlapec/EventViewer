@@ -1,12 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Amazon.SimpleNotificationService;
-using Amazon.SimpleNotificationService.Model;
+// <copyright file="PipelineTopic.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace EventViewer.Pipeline
 {
-    public static class Topic
+    using Amazon.SimpleNotificationService;
+    using Amazon.SimpleNotificationService.Model;
+
+    /// <summary>
+    /// Helper methods for topic.
+    /// </summary>
+    public static class PipelineTopic
     {
         /// <summary>
         /// Creates a new subscription to a topic.
@@ -14,23 +18,24 @@ namespace EventViewer.Pipeline
         /// <param name="client">The initialized Amazon SNS client object, used
         /// to create an Amazon SNS subscription.</param>
         /// <param name="topicArn">The ARN of the topic to subscribe to.</param>
+        /// <param name="queueUrl">The queue url.</param>
         /// <returns>A SubscribeResponse object which includes the subscription
         /// ARN for the new subscription.</returns>
+        /// </summary>
         public static async Task<SubscribeResponse> SubscribeQueueAsync(
             IAmazonSimpleNotificationService client,
             string topicArn,
             string queueUrl)
         {
-            SubscribeRequest request = new SubscribeRequest()
+            SubscribeRequest request = new ()
             {
                 TopicArn = topicArn,
                 ReturnSubscriptionArn = true,
                 Endpoint = queueUrl,
-                Protocol = "sqs"
+                Protocol = "sqs",
             };
 
-            var response = await client.SubscribeQueue(request);
-
+            var response = await client.SubscribeAsync(request);
             return response;
         }
 
@@ -41,17 +46,20 @@ namespace EventViewer.Pipeline
         /// <param name="client">The initialized Amazon SNS client object, used
         /// to delete an Amazon SNS subscription.</param>
         /// <param name="subscriptionArn">The ARN of the subscription to delete.</param>
+        /// <returns>Task.</returns>
+        /// </summary>
         public static async Task UnsubscribeAsync(
             IAmazonSimpleNotificationService client,
             string subscriptionArn)
         {
-            var response = await client.UnsubscribeAsync(subscriptionArn);
+            await client.UnsubscribeAsync(subscriptionArn);
         }
 
         /// <summary>
         /// Displays the list of Amazon SNS Topic ARNs.
         /// <param name="client">The initialized Amazon SNS client object, used
         /// to create an Amazon SNS subscription.</param>
+        /// <returns>Task.</returns>
         /// </summary>
         public static async Task ListTopicsAsync(IAmazonSimpleNotificationService client)
         {
@@ -63,7 +71,6 @@ namespace EventViewer.Pipeline
             foreach (var topic in topicList)
             {
                 Console.WriteLine($"${index} --");
-                Console.WriteLine($"{topic.Name}");
                 Console.WriteLine($"{topic.TopicArn}");
                 index++;
             }
@@ -72,9 +79,6 @@ namespace EventViewer.Pipeline
         private static async Task<List<Topic>> GetTopicListAsync(IAmazonSimpleNotificationService client)
         {
             var topics = new List<Topic>();
-            // If there are more than 100 Amazon SNS topics, the call to
-            // ListTopicsAsync will return a value to pass to the
-            // method to retrieve the next 100 (or less) topics.
             string nextToken = string.Empty;
 
             do
