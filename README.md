@@ -28,7 +28,7 @@ commands:
 
 options:
   --topic-arn     => arn of the SNS topic, required for Subscribe and Unsubscribe commands
-  --endpoint-url  => AWS endpoint url
+  --endpoint-url  => AWS endpoint url (default: http://localhost:4566)
   --pretty
 ```
 
