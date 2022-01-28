@@ -1,7 +1,6 @@
 // <copyright file="PipelineQueue.cs" company="PlaceholderCompany">
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
-
 namespace EventViewer.Pipeline
 {
     using System;
@@ -9,6 +8,9 @@ namespace EventViewer.Pipeline
     using System.Threading.Tasks;
     using Amazon.SQS;
     using Amazon.SQS.Model;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using EventViewer.Models;
 
     /// <summary>
     /// Helper methods for Queue.
@@ -74,17 +76,21 @@ namespace EventViewer.Pipeline
         /// <param name="queueUrl">The url of the queue.</param>
         /// <returns>Task.</returns>
         /// </summary>
-        public static async Task ListenToSqsQueue(IAmazonSQS client, string queueUrl)
+        public static async Task ListenToSqsQueue(IAmazonSQS client, string queueUrl, bool pretty = false)
         {
+            JObject json = new JObject();
+
             while (true)
             {
                 var response = await ReceiveMessage(client, queueUrl);
                 response.Messages.ForEach(m =>
-                {
-                    Console.WriteLine($"{m.Body}");
-                });
+                    {
+                        CbcEvent cbcEvent = JsonConvert.DeserializeObject<CbcEvent>(m.Body);
+                        Console.WriteLine($"{cbcEvent.ToString(pretty)}");
+                    }
+                );
 
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
 

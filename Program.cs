@@ -15,6 +15,11 @@ namespace EventViewer
     public enum CommandOption
     {
         /// <summary>
+        /// Help.
+        /// </summary>
+        Help,
+
+        /// <summary>
         /// Lists topics.
         /// </summary>
         ListTopics,
@@ -34,10 +39,6 @@ namespace EventViewer
         /// </summary>
         Unsubscribe,
 
-        /// <summary>
-        /// Help.
-        /// </summary>
-        Help,
     }
 
     /// <summary>
@@ -53,7 +54,7 @@ namespace EventViewer
         /// <summary>
         /// Gets Command.
         /// </summary>
-        [Argument(0, Description = "Command one of [ListTopics, Subscribe --topic-arn, Unsubscribe --topic-arn, Listen")]
+        [Argument(0, Description = "Command one of [ListTopics, Subscribe --topic-arn, Unsubscribe --topic-arn, Listen [Option: --pretty]")]
         public CommandOption Command { get; } = default!;
 
         /// <summary>
@@ -67,6 +68,12 @@ namespace EventViewer
         /// </summary>
         [Option("--endpoint-url", Description = "Aws endpoint url")]
         public string EndpointUrl { get; } = "http://localhost:4566";
+
+        /// <summary>
+        /// Format to pretty JSON view.
+        /// </summary>
+        [Option("--pretty", Description = "Pretty JSON view")]
+        public bool Pretty { get; } = false;
 
         private async Task<int> OnExecuteAsync(CommandLineApplication app,
                                                CancellationToken cancellationToken = default)
@@ -97,7 +104,7 @@ namespace EventViewer
                     await PipelineTopic.UnsubscribeAsync(snsClient, subscriptionArn);
                     break;
                 case CommandOption.Listen:
-                    await PipelineQueue.ListenToSqsQueue(sqsClient, queueUrl);
+                    await PipelineQueue.ListenToSqsQueue(sqsClient, queueUrl, Pretty);
                     break;
                 case CommandOption.Help:
                     app.ShowHelp();

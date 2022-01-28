@@ -12,6 +12,7 @@
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.2.21" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.2.10" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
