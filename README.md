@@ -10,8 +10,9 @@ dotnet restore
 dotnet run <command> <Optional: options>
 ```
 
+```
 commands:
-  - ListTopics     Lists all topics
+  - ListTopics     => Lists all topics
 
   - Subscribe      Subscribes to the give topic to receive events,
                    Option (required) [--topic-arn] topic arn
@@ -29,6 +30,7 @@ options:
   --topic-arn     => arn of the SNS topic, required for Subscribe and Unsubscribe commands
   --endpoint-url  => AWS endpoint url
   --pretty
+```
 
 ## Envirionment
 
