@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EventViewer</name>
+    </assembly>
+    <members>
+        <member name="T:EventViewer.Models.CbcEvent">
+            <summary>
+            CbcEvent.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Models.CbcEvent.Type">
+            <summary>
+            Gets or sets Command.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Models.CbcEvent.MessageId">
+            <summary>
+            Gets or sets MessageId.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Models.CbcEvent.TopicArn">
+            <summary>
+            Gets or sets TopicArn.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Models.CbcEvent.Message">
+            <summary>
+            Gets or sets Message.
+            </summary>
+        </member>
+        <member name="M:EventViewer.Models.CbcEvent.ToString(System.Boolean)">
+            <summary>
+            Converts tp string.
+            </summary>
+            <param name="pretty">Makes result prettier.</param>
+            <returns>String.</returns>
+        </member>
+        <member name="M:EventViewer.Models.CbcEvent.ToString">
+            <summary>
+            Converts tp string.
+            </summary>
+            <returns>String.</returns>
+        </member>
+        <member name="T:EventViewer.Pipeline.PipelineQueue">
+            <summary>
+            Helper methods for Queue.
+            </summary>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineQueue.CreateAsync(Amazon.SQS.IAmazonSQS,System.String)">
+            <summary>
+            Creates a new subscription to a topic.
+            </summary>
+            <param name="client">The initialized Amazon SQS client object, used
+            to create sqs queue.</param>
+            <param name="queueName">The name of the queue.</param>
+            <returns>A string object which includes the queue url.</returns>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineQueue.ListenToSqsQueue(Amazon.SQS.IAmazonSQS,System.String,System.Boolean)">
+            <summary>
+            Listens to SQS queue.
+            </summary>
+            <param name="client">The initialized Amazon SQS client object, used
+            to create sqs queue.</param>
+            <param name="queueUrl">The url of the queue.</param>
+            <param name="pretty">Prints prettier events.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="T:EventViewer.Pipeline.PipelineTopic">
+            <summary>
+            Helper methods for topic.
+            </summary>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineTopic.SubscribeQueueAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,System.String,System.String)">
+            <summary>
+            Creates a new subscription to a topic.
+            </summary>
+            <param name="client">The initialized Amazon SNS client object, used
+            to create an Amazon SNS subscription.</param>
+            <param name="topicArn">The ARN of the topic to subscribe to.</param>
+            <param name="queueUrl">The queue url.</param>
+            <returns>A SubscribeResponse object which includes the subscription
+            ARN for the new subscription.</returns>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineTopic.UnsubscribeAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,System.String)">
+            <summary>
+            Given the ARN for an Amazon SNS subscription, this method deletes
+            the subscription.
+            </summary>
+            <param name="client">The initialized Amazon SNS client object, used
+            to delete an Amazon SNS subscription.</param>
+            <param name="subscriptionArn">The ARN of the subscription to delete.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineTopic.ListTopicsAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService)">
+            <summary>
+            Displays the list of Amazon SNS Topic ARNs.
+            </summary>
+            <param name="client">The initialized Amazon SNS client object, used
+            to create an Amazon SNS subscription.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="T:EventViewer.CommandOption">
+            <summary>
+            CommandOption.
+            </summary>
+        </member>
+        <member name="F:EventViewer.CommandOption.Help">
+            <summary>
+            Help.
+            </summary>
+        </member>
+        <member name="F:EventViewer.CommandOption.ListTopics">
+            <summary>
+            Lists topics.
+            </summary>
+        </member>
+        <member name="F:EventViewer.CommandOption.Subscribe">
+            <summary>
+            Subscribes topics to queue.
+            </summary>
+        </member>
+        <member name="F:EventViewer.CommandOption.Listen">
+            <summary>
+            Listens to queue.
+            </summary>
+        </member>
+        <member name="F:EventViewer.CommandOption.Unsubscribe">
+            <summary>
+            Unsubscribes topics to queue.
+            </summary>
+        </member>
+        <member name="T:EventViewer.Program">
+            <summary>
+            Program.
+            </summary>
+        </member>
+        <member name="M:EventViewer.Program.Main(System.String[])">
+            <summary>
+            Main Program.
+            </summary>
+            <param name="args">Arguments.</param>
+            <returns>Integer.</returns>
+        </member>
+        <member name="P:EventViewer.Program.Command">
+            <summary>
+            Gets Command.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Program.TopicArn">
+            <summary>
+            Gets Topic Arn.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Program.EndpointUrl">
+            <summary>
+            Gets EndpointUrl.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Program.Pretty">
+            <summary>
+            Gets a value indicating whether the item is enabled.
+            </summary>
+        </member>
+    </members>
+</doc>

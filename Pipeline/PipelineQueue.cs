@@ -1,6 +1,7 @@
 // <copyright file="PipelineQueue.cs" company="PlaceholderCompany">
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
+
 namespace EventViewer.Pipeline
 {
     using System;
@@ -8,13 +9,13 @@ namespace EventViewer.Pipeline
     using System.Threading.Tasks;
     using Amazon.SQS;
     using Amazon.SQS.Model;
+    using EventViewer.Models;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using EventViewer.Models;
 
     /// <summary>
     /// Helper methods for Queue.
-    /// </summary
+    /// </summary>
     public class PipelineQueue
     {
         private static Dictionary<string, string> QueueAttributes
@@ -55,7 +56,6 @@ namespace EventViewer.Pipeline
         /// to create sqs queue.</param>
         /// <param name="queueName">The name of the queue.</param>
         /// <returns>A string object which includes the queue url.</returns>
-        /// </summary>
         public static async Task<string> CreateAsync(IAmazonSQS client, string queueName)
         {
             var request = new CreateQueueRequest
@@ -74,8 +74,8 @@ namespace EventViewer.Pipeline
         /// <param name="client">The initialized Amazon SQS client object, used
         /// to create sqs queue.</param>
         /// <param name="queueUrl">The url of the queue.</param>
+        /// <param name="pretty">Prints prettier events.</param>
         /// <returns>Task.</returns>
-        /// </summary>
         public static async Task ListenToSqsQueue(IAmazonSQS client, string queueUrl, bool pretty = false)
         {
             JObject json = new JObject();
@@ -84,11 +84,14 @@ namespace EventViewer.Pipeline
             {
                 var response = await ReceiveMessage(client, queueUrl);
                 response.Messages.ForEach(m =>
+                {
+                    CbcEvent? cbcEvent = JsonConvert.DeserializeObject<CbcEvent>(m.Body);
+
+                    if (cbcEvent != null)
                     {
-                        CbcEvent cbcEvent = JsonConvert.DeserializeObject<CbcEvent>(m.Body);
                         Console.WriteLine($"{cbcEvent.ToString(pretty)}");
                     }
-                );
+                });
 
                 Thread.Sleep(500);
             }
