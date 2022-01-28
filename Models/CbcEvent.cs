@@ -1,20 +1,24 @@
 namespace EventViewer.Models
 {
     using System;
+    using System.Text;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using System.Text;
 
     [JsonObject]
-    public class CbcEvent{
+    public class CbcEvent {
+
         [JsonProperty("Type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = default!;
+
         [JsonProperty("MessageId")]
-        public string MessageId { get; set; }
+        public string MessageId { get; set; } = default!;
+
         [JsonProperty("TopicArn")]
-        public string TopicArn {get; set;}
+        public string TopicArn { get; set; } = default!;
+
         [JsonProperty("Message")]
-        public string Message { get; set; }
+        public string Message { get; set; } = default!;
 
         public string ToString(bool pretty)
         {
