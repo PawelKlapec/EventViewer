@@ -20,6 +20,11 @@ namespace EventViewer
         Help,
 
         /// <summary>
+        /// Subscriptions list.
+        /// </summary>
+        Subscriptions,
+
+        /// <summary>
         /// Lists topics.
         /// </summary>
         ListTopics,
@@ -37,7 +42,7 @@ namespace EventViewer
         /// <summary>
         /// Unsubscribes topics to queue.
         /// </summary>
-        Unsubscribe,
+        Unsubscribe
     }
 
     /// <summary>
@@ -77,6 +82,12 @@ namespace EventViewer
         [Option("--pretty", Description = "Pretty JSON view")]
         public bool Pretty { get; } = false;
 
+        /// <summary>
+        /// Gets All.
+        /// </summary>
+        [Option("--all", Description = "Param to get all")]
+        public bool All { get; } = false;
+
         #pragma warning disable IDE0051 // Special method comming from CommandLineUtils
         #pragma warning disable IDE0060 // Special parameter comming from CommandLineUtils
         private async Task<int> OnExecuteAsync(
@@ -98,15 +109,16 @@ namespace EventViewer
             switch (this.Command)
             {
                 case CommandOption.ListTopics:
-                    await PipelineTopic.ListTopicsAsync(snsClient);
+                    await PipelineTopic.PrintTopicListAsync(snsClient);
                     break;
                 case CommandOption.Subscribe:
                     await PipelineTopic.SubscribeQueueAsync(snsClient, this.TopicArn, queueUrl);
                     break;
+                case CommandOption.Subscriptions:
+                    await PipelineTopic.GetListSubscriptions(snsClient);
+                    break;
                 case CommandOption.Unsubscribe:
-                    var response = await PipelineTopic.SubscribeQueueAsync(snsClient, this.TopicArn, queueUrl);
-                    string subscriptionArn = response.SubscriptionArn;
-                    await PipelineTopic.UnsubscribeAsync(snsClient, subscriptionArn);
+                    await PipelineTopic.UnsubscribeAsync(snsClient, this.TopicArn, queueUrl, this.All);
                     break;
                 case CommandOption.Listen:
                     await PipelineQueue.ListenToSqsQueue(sqsClient, queueUrl, this.Pretty);
