@@ -112,6 +112,10 @@ namespace EventViewer
                     await PipelineTopic.PrintTopicListAsync(snsClient);
                     break;
                 case CommandOption.Subscribe:
+                    if(this.All){
+                        await PipelineTopic.SubscribeAllQueueAsync(snsClient, queueUrl);
+                        break;
+                    }
                     await PipelineTopic.SubscribeQueueAsync(snsClient, this.TopicArn, queueUrl);
                     break;
                 case CommandOption.Subscriptions:

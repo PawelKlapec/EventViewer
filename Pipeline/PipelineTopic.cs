@@ -12,6 +12,15 @@ namespace EventViewer.Pipeline
     /// </summary>
     public static class PipelineTopic
     {
+        /// <summary>
+        /// Creates a new subscription to a topic.
+        /// </summary>
+        /// <param name="client">The initialized Amazon SNS client object, used
+        /// to create an Amazon SNS subscription.</param>
+        /// <param name="topicArn">The ARN of the topic to subscribe to.</param>
+        /// <param name="queueUrl">The queue url.</param>
+        /// <returns>A SubscribeResponse object which includes the subscription
+        /// ARN for the new subscription.</returns>
         public static async Task<SubscribeResponse> SubscribeQueueAsync(
             IAmazonSimpleNotificationService client,
             string topicArn,
@@ -73,7 +82,7 @@ namespace EventViewer.Pipeline
                 return;
             }
 
-            var listSubscriptions = await PipelineTopic.GetListSubscriptions(client); 
+            var listSubscriptions = await PipelineTopic.GetListSubscriptions(client);
             foreach (var item in listSubscriptions)
             {
                 await client.UnsubscribeAsync(item.SubscriptionArn, cancellationToken);
