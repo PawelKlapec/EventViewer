@@ -100,6 +100,9 @@
             <param name="client">The initialized Amazon SNS client object, used
             to delete an Amazon SNS subscription.</param>
             <param name="topicArn">The ARN of the topic to delete.</param>
+            <param name="queueUrl">The queue url.</param>
+            <param name="all">The all flag.</param>
+            <param name="cancellationToken">The cancellation Token.</param>
             <returns>Task.</returns>
         </member>
         <member name="M:EventViewer.Pipeline.PipelineTopic.PrintTopicListAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService)">
@@ -118,12 +121,13 @@
             to create an Amazon SNS subscription.</param>
             <returns>Task with List of Topic.</returns>
         </member>
-        <member name="M:EventViewer.Pipeline.PipelineTopic.GetListSubscriptions(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService)">
+        <member name="M:EventViewer.Pipeline.PipelineTopic.GetListSubscriptions(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,System.Threading.CancellationToken)">
             <summary>
             Returns a list of the requester's subscriptions.
             </summary>
             <param name="client">The initialized Amazon SNS client object, used
             to create an Amazon SNS subscription.</param>
+            <param name="cancellationToken">The cancellation Token.</param>
             <returns>Task with List of Topic.</returns>
         </member>
         <member name="T:EventViewer.CommandOption">
@@ -195,7 +199,7 @@
         </member>
         <member name="P:EventViewer.Program.All">
             <summary>
-            Gets All.
+            Gets a value indicating whether all.
             </summary>
         </member>
     </members>

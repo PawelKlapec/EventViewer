@@ -57,6 +57,7 @@ namespace EventViewer.Pipeline
                 var response = SubscribeQueueAsync(client, topic.TopicArn, queueUrl);
                 responseList.Add(topic.TopicArn, response);
             }
+
             return responseList;
         }
 
@@ -67,22 +68,26 @@ namespace EventViewer.Pipeline
         /// <param name="client">The initialized Amazon SNS client object, used
         /// to delete an Amazon SNS subscription.</param>
         /// <param name="topicArn">The ARN of the topic to delete.</param>
+        /// <param name="queueUrl">The queue url.</param>
+        /// <param name="all">The all flag.</param>
+        /// <param name="cancellationToken">The cancellation Token.</param>
         /// <returns>Task.</returns>
         public static async Task UnsubscribeAsync(
             IAmazonSimpleNotificationService client,
             string topicArn,
             string queueUrl,
-            bool all = false,
-            CancellationToken cancellationToken = new CancellationToken())
+            bool all,
+            CancellationToken cancellationToken)
         {
-            if(!all){
+            if (!all)
+            {
                 var response = await SubscribeQueueAsync(client, topicArn, queueUrl);
                 string subscriptionArn = response.SubscriptionArn;
                 await client.UnsubscribeAsync(subscriptionArn, cancellationToken);
                 return;
             }
 
-            var listSubscriptions = await PipelineTopic.GetListSubscriptions(client);
+            var listSubscriptions = await PipelineTopic.GetListSubscriptions(client, cancellationToken);
             foreach (var item in listSubscriptions)
             {
                 await client.UnsubscribeAsync(item.SubscriptionArn, cancellationToken);
@@ -137,10 +142,10 @@ namespace EventViewer.Pipeline
         /// </summary>
         /// <param name="client">The initialized Amazon SNS client object, used
         /// to create an Amazon SNS subscription.</param>
+        /// <param name="cancellationToken">The cancellation Token.</param>
         /// <returns>Task with List of Topic.</returns>
-        public static async Task<List<Subscription>> GetListSubscriptions(IAmazonSimpleNotificationService client)
+        public static async Task<List<Subscription>> GetListSubscriptions(IAmazonSimpleNotificationService client, CancellationToken cancellationToken)
         {
-            var cancellationToken = new CancellationToken();
             var response = await client.ListSubscriptionsAsync(cancellationToken);
             Console.WriteLine($"Subscriptions list [{response.Subscriptions.Count}]\n--------------");
             var index = 1;

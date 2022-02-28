@@ -42,7 +42,7 @@ namespace EventViewer
         /// <summary>
         /// Unsubscribes topics to queue.
         /// </summary>
-        Unsubscribe
+        Unsubscribe,
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ namespace EventViewer
         /// <summary>
         /// Gets Command.
         /// </summary>
-        [Argument(0, Description = "Command one of [ListTopics, Subscribe --topic-arn, Unsubscribe --topic-arn, Listen [Option: --pretty]")]
+        [Argument(0, Description = "Command one of [ListTopics, Subscriptions, Subscribe [--topic-arn or --all], Unsubscribe [--topic-arn or --all], Listen [Option: --pretty]")]
         #pragma warning disable SA1201 // Supress due to special decorator
         public CommandOption Command { get; } = default!;
 
@@ -83,7 +83,7 @@ namespace EventViewer
         public bool Pretty { get; } = false;
 
         /// <summary>
-        /// Gets All.
+        /// Gets a value indicating whether all.
         /// </summary>
         [Option("--all", Description = "Param to get all")]
         public bool All { get; } = false;
@@ -112,17 +112,19 @@ namespace EventViewer
                     await PipelineTopic.PrintTopicListAsync(snsClient);
                     break;
                 case CommandOption.Subscribe:
-                    if(this.All){
+                    if (this.All)
+                    {
                         await PipelineTopic.SubscribeAllQueueAsync(snsClient, queueUrl);
                         break;
                     }
+
                     await PipelineTopic.SubscribeQueueAsync(snsClient, this.TopicArn, queueUrl);
                     break;
                 case CommandOption.Subscriptions:
-                    await PipelineTopic.GetListSubscriptions(snsClient);
+                    await PipelineTopic.GetListSubscriptions(snsClient, cancellationToken);
                     break;
                 case CommandOption.Unsubscribe:
-                    await PipelineTopic.UnsubscribeAsync(snsClient, this.TopicArn, queueUrl, this.All);
+                    await PipelineTopic.UnsubscribeAsync(snsClient, this.TopicArn, queueUrl, this.All, cancellationToken);
                     break;
                 case CommandOption.Listen:
                     await PipelineQueue.ListenToSqsQueue(sqsClient, queueUrl, this.Pretty);
