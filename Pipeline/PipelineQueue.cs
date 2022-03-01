@@ -78,7 +78,7 @@ namespace EventViewer.Pipeline
         /// <returns>Task.</returns>
         public static async Task ListenToSqsQueue(IAmazonSQS client, string queueUrl, bool pretty = false)
         {
-            JObject json = new JObject();
+            JObject json = new ();
 
             while (true)
             {

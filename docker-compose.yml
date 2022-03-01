@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+    event-viewer:
+        image: 'event-viewer'
+        container_name: event-viewer
+        command: Listen --subscribe-all
+        environment:
+          - ENDPOINT_URL=http://localhost:4566
+          - PRETTY=false
+          - TOPIC_ARN=

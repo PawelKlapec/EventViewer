@@ -4,6 +4,41 @@
         <name>EventViewer</name>
     </assembly>
     <members>
+        <member name="T:EventViewer.Aws.Client">
+            <summary>
+            Setting up AWS clients.
+            </summary>
+        </member>
+        <member name="M:EventViewer.Aws.Client.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:EventViewer.Aws.Client"/> class.
+            </summary>
+            <param name="endpointUrl"> AWS endpoint.</param>
+        </member>
+        <member name="P:EventViewer.Aws.Client.Sns">
+            <summary>
+            Gets Sns client.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Aws.Client.Sqs">
+            <summary>
+            Gets Sqs client.
+            </summary>
+        </member>
+        <member name="M:EventViewer.Aws.Client.SetSnsClient(System.String)">
+            <summary>
+            This method returns Sns Client.
+            </summary>
+            <param name="endpointUrl"> AWS endpoint.</param>
+            <returns>AmazonSimpleNotificationServiceClient.</returns>
+        </member>
+        <member name="M:EventViewer.Aws.Client.SetSqsClient(System.String)">
+            <summary>
+            This method returns Sqs Client.
+            </summary>
+            <param name="endpointUrl"> AWS endpoint.</param>
+            <returns>AmazonSQSClient.</returns>
+        </member>
         <member name="T:EventViewer.Models.CbcEvent">
             <summary>
             CbcEvent.
