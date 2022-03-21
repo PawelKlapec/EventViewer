@@ -117,23 +117,53 @@
             <returns>A SubscribeResponse object which includes the subscription
             ARN for the new subscription.</returns>
         </member>
-        <member name="M:EventViewer.Pipeline.PipelineTopic.UnsubscribeAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,System.String)">
+        <member name="M:EventViewer.Pipeline.PipelineTopic.SubscribeAllQueueAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,System.String)">
+            <summary>
+            Creates a new subscription to a topic.
+            </summary>
+            <param name="client">The initialized Amazon SNS client object, used
+            to create an Amazon SNS subscription.</param>
+            <param name="queueUrl">The queue url.</param>
+            <returns>A SubscribeResponse object which includes the subscription
+            ARN for the new subscription.</returns>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineTopic.UnsubscribeAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,System.String,System.String,System.Boolean,System.Threading.CancellationToken)">
             <summary>
             Given the ARN for an Amazon SNS subscription, this method deletes
             the subscription.
             </summary>
             <param name="client">The initialized Amazon SNS client object, used
             to delete an Amazon SNS subscription.</param>
-            <param name="subscriptionArn">The ARN of the subscription to delete.</param>
+            <param name="topicArn">The ARN of the topic to delete.</param>
+            <param name="queueUrl">The queue url.</param>
+            <param name="all">The all flag.</param>
+            <param name="cancellationToken">The cancellation Token.</param>
             <returns>Task.</returns>
         </member>
-        <member name="M:EventViewer.Pipeline.PipelineTopic.ListTopicsAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService)">
+        <member name="M:EventViewer.Pipeline.PipelineTopic.PrintTopicListAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService)">
             <summary>
             Displays the list of Amazon SNS Topic ARNs.
             </summary>
             <param name="client">The initialized Amazon SNS client object, used
             to create an Amazon SNS subscription.</param>
             <returns>Task.</returns>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineTopic.GetTopicListAsync(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService)">
+            <summary>
+            Return the list of Amazon SNS Topic ARNs.
+            </summary>
+            <param name="client">The initialized Amazon SNS client object, used
+            to create an Amazon SNS subscription.</param>
+            <returns>Task with List of Topic.</returns>
+        </member>
+        <member name="M:EventViewer.Pipeline.PipelineTopic.GetListSubscriptions(Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,System.Threading.CancellationToken)">
+            <summary>
+            Returns a list of the requester's subscriptions.
+            </summary>
+            <param name="client">The initialized Amazon SNS client object, used
+            to create an Amazon SNS subscription.</param>
+            <param name="cancellationToken">The cancellation Token.</param>
+            <returns>Task with List of Topic.</returns>
         </member>
         <member name="T:EventViewer.CommandOption">
             <summary>
@@ -143,6 +173,11 @@
         <member name="F:EventViewer.CommandOption.Help">
             <summary>
             Help.
+            </summary>
+        </member>
+        <member name="F:EventViewer.CommandOption.Subscriptions">
+            <summary>
+            Subscriptions list.
             </summary>
         </member>
         <member name="F:EventViewer.CommandOption.ListTopics">
@@ -195,6 +230,11 @@
         <member name="P:EventViewer.Program.Pretty">
             <summary>
             Gets a value indicating whether the item is enabled.
+            </summary>
+        </member>
+        <member name="P:EventViewer.Program.All">
+            <summary>
+            Gets a value indicating whether all.
             </summary>
         </member>
     </members>

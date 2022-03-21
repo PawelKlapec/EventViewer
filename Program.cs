@@ -19,6 +19,11 @@ namespace EventViewer
         Help,
 
         /// <summary>
+        /// Subscriptions list.
+        /// </summary>
+        Subscriptions,
+
+        /// <summary>
         /// Lists topics.
         /// </summary>
         ListTopics,
@@ -54,7 +59,7 @@ namespace EventViewer
         /// <summary>
         /// Gets Command.
         /// </summary>
-        [Argument(0, Description = "Command one of [ListTopics, Subscribe --topic-arn, Unsubscribe --topic-arn, Listen [Option: --pretty]")]
+        [Argument(0, Description = "Command one of [ListTopics, Subscriptions, Subscribe [--topic-arn or --all], Unsubscribe [--topic-arn or --all], Listen [Option: --pretty]")]
         #pragma warning disable SA1201 // Supress due to special decorator
         public CommandOption Command { get; } = CommandOption.Help;
 
@@ -76,30 +81,43 @@ namespace EventViewer
         [Option("--pretty", Description = "Pretty JSON view")]
         public bool Pretty { get; } = bool.Parse(Environment.GetEnvironmentVariable("PRETTY") ?? "false");
 
+        /// <summary>
+        /// Gets a value indicating whether all.
+        /// </summary>
+        [Option("--all", Description = "Param to get all")]
+        public bool All { get; } = false;
+
         #pragma warning disable IDE0051 // Special method comming from CommandLineUtils
         #pragma warning disable IDE0060 // Special parameter comming from CommandLineUtils
         private async Task<int> OnExecuteAsync(
             CommandLineApplication app,
             CancellationToken cancellationToken = default)
-        {
-            var awsClient = new Client(this.EndpointUrl);
-            var queueUrl = await PipelineQueue.CreateAsync(awsClient.Sqs, "DevListener");
+        {   
+            var client = new Aws.Client(this.EndpointUrl);
+            var queueUrl = await PipelineQueue.CreateAsync(sqsClient, "DevListener");
 
             switch (this.Command)
             {
                 case CommandOption.ListTopics:
-                    await PipelineTopic.ListTopicsAsync(awsClient.Sns);
+                    await PipelineTopic.PrintTopicListAsync(client.Sns);
                     break;
                 case CommandOption.Subscribe:
-                    await PipelineTopic.SubscribeQueueAsync(awsClient.Sns, this.TopicArn, queueUrl);
+                    if (this.All)
+                    {
+                        await PipelineTopic.SubscribeAllQueueAsync(client.Sns, queueUrl);
+                        break;
+                    }
+
+                    await PipelineTopic.SubscribeQueueAsync(client.Sns, this.TopicArn, queueUrl);
+                    break;
+                case CommandOption.Subscriptions:
+                    await PipelineTopic.GetListSubscriptions(client.Sns, cancellationToken);
                     break;
                 case CommandOption.Unsubscribe:
-                    var response = await PipelineTopic.SubscribeQueueAsync(awsClient.Sns, this.TopicArn, queueUrl);
-                    string subscriptionArn = response.SubscriptionArn;
-                    await PipelineTopic.UnsubscribeAsync(awsClient.Sns, subscriptionArn);
+                    await PipelineTopic.UnsubscribeAsync(client.Sns, this.TopicArn, queueUrl, this.All, cancellationToken);
                     break;
                 case CommandOption.Listen:
-                    await PipelineQueue.ListenToSqsQueue(awsClient.Sqs, queueUrl, this.Pretty);
+                    await PipelineQueue.ListenToSqsQueue(client.Sqs, queueUrl, this.Pretty);
                     break;
                 case CommandOption.Help:
                     app.ShowHelp();
