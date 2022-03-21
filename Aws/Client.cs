@@ -52,7 +52,7 @@ namespace EventViewer.Aws
             var credentials = new BasicAWSCredentials("key", "secret");
             var config = new AmazonSimpleNotificationServiceConfig
             {
-            ServiceURL = endpointUrl,
+                ServiceURL = endpointUrl,
             };
 
             return new AmazonSimpleNotificationServiceClient(credentials, config);

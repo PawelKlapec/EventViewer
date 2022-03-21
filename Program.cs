@@ -68,7 +68,7 @@ namespace EventViewer
         /// Gets EndpointUrl.
         /// </summary>
         [Option("--endpoint-url", Description = "Aws endpoint url")]
-        public string EndpointUrl { get; } = Environment.GetEnvironmentVariable("ENDPOINT_URL") ?? "http://localstack.dev.sageone.com:4566";
+        public string EndpointUrl { get; } = Environment.GetEnvironmentVariable("ENDPOINT_URL") ?? "localhost:4566";
 
         /// <summary>
         /// Gets a value indicating whether the item is enabled.

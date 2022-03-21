@@ -1,10 +1,34 @@
 version: "3.9"
 services:
-    event-viewer:
-        image: 'event-viewer'
-        container_name: event-viewer
-        command: Listen --subscribe-all
-        environment:
-          - ENDPOINT_URL=http://localhost:4566
-          - PRETTY=false
-          - TOPIC_ARN=
+  event-viewer:
+    image: 'event_viewer'
+    container_name: event-viewer
+    command: Listen --subscribe-all
+    environment:
+      - ENDPOINT_URL=http://localhost:4566
+      - PRETTY=false
+      - TOPIC_ARN=
+    networks:
+      - event-viewer-network
+
+  localstack:
+    container_name: "event-viewer-localstack"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4510-4559:4510-4559"  # external service port range
+      - "127.0.0.1:4566:4566"            # LocalStack Edge Proxy
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - SERVICES=sns,sqs
+      - DEBUG=true
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+        - event-viewer-network
+
+networks:
+  event-viewer-network:
+    name: event-viewer-network
+    driver: bridge
