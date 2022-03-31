@@ -4,8 +4,7 @@
 
 namespace EventViewer
 {
-    using Amazon.SimpleNotificationService;
-    using Amazon.SQS;
+    using EventViewer.Aws;
     using EventViewer.Pipeline;
     using McMaster.Extensions.CommandLineUtils;
 
@@ -62,25 +61,25 @@ namespace EventViewer
         /// </summary>
         [Argument(0, Description = "Command one of [ListTopics, Subscriptions, Subscribe [--topic-arn or --all], Unsubscribe [--topic-arn or --all], Listen [Option: --pretty]")]
         #pragma warning disable SA1201 // Supress due to special decorator
-        public CommandOption Command { get; } = default!;
+        public CommandOption Command { get; } = CommandOption.Help;
 
         /// <summary>
         /// Gets Topic Arn.
         /// </summary>
         [Option("--topic-arn", Description = "Topic arn")]
-        public string TopicArn { get; } = default!;
+        public string TopicArn { get; } = Environment.GetEnvironmentVariable("TOPIC_ARN") ?? string.Empty;
 
         /// <summary>
         /// Gets EndpointUrl.
         /// </summary>
         [Option("--endpoint-url", Description = "Aws endpoint url")]
-        public string EndpointUrl { get; } = "http://localhost:4566";
+        public string EndpointUrl { get; } = Environment.GetEnvironmentVariable("ENDPOINT_URL") ?? "localhost:4566";
 
         /// <summary>
         /// Gets a value indicating whether the item is enabled.
         /// </summary>
         [Option("--pretty", Description = "Pretty JSON view")]
-        public bool Pretty { get; } = false;
+        public bool Pretty { get; } = bool.Parse(Environment.GetEnvironmentVariable("PRETTY") ?? "false");
 
         /// <summary>
         /// Gets a value indicating whether all.
@@ -93,41 +92,32 @@ namespace EventViewer
         private async Task<int> OnExecuteAsync(
             CommandLineApplication app,
             CancellationToken cancellationToken = default)
-        {
-            var snsClient = new AmazonSimpleNotificationServiceClient(
-                new AmazonSimpleNotificationServiceConfig
-                {
-                    ServiceURL = this.EndpointUrl,
-                });
-            var sqsClient = new AmazonSQSClient(
-                new AmazonSQSConfig
-                {
-                    ServiceURL = this.EndpointUrl,
-                });
+        {   
+            var client = new Aws.Client(this.EndpointUrl);
             var queueUrl = await PipelineQueue.CreateAsync(sqsClient, "DevListener");
 
             switch (this.Command)
             {
                 case CommandOption.ListTopics:
-                    await PipelineTopic.PrintTopicListAsync(snsClient);
+                    await PipelineTopic.PrintTopicListAsync(client.Sns);
                     break;
                 case CommandOption.Subscribe:
                     if (this.All)
                     {
-                        await PipelineTopic.SubscribeAllQueueAsync(snsClient, queueUrl);
+                        await PipelineTopic.SubscribeAllQueueAsync(client.Sns, queueUrl);
                         break;
                     }
 
-                    await PipelineTopic.SubscribeQueueAsync(snsClient, this.TopicArn, queueUrl);
+                    await PipelineTopic.SubscribeQueueAsync(client.Sns, this.TopicArn, queueUrl);
                     break;
                 case CommandOption.Subscriptions:
-                    await PipelineTopic.GetListSubscriptions(snsClient, cancellationToken);
+                    await PipelineTopic.GetListSubscriptions(client.Sns, cancellationToken);
                     break;
                 case CommandOption.Unsubscribe:
-                    await PipelineTopic.UnsubscribeAsync(snsClient, this.TopicArn, queueUrl, this.All, cancellationToken);
+                    await PipelineTopic.UnsubscribeAsync(client.Sns, this.TopicArn, queueUrl, this.All, cancellationToken);
                     break;
                 case CommandOption.Listen:
-                    await PipelineQueue.ListenToSqsQueue(sqsClient, queueUrl, this.Pretty);
+                    await PipelineQueue.ListenToSqsQueue(client.Sqs, queueUrl, this.Pretty);
                     break;
                 case CommandOption.Help:
                     app.ShowHelp();

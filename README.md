@@ -65,3 +65,12 @@ To install additional .NET runtimes or SDKs:
 
 ## Development
 - [Installation](https://docs.microsoft.com/en-us/dotnet/core/install/linux)
+
+## Deployment
+
+```
+aws --profile <profile> ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.eu-west-1.amazonaws.com
+```
+aws_account_id - AWS account id
+region - region
+profile -AWS profile

@@ -48,7 +48,7 @@ namespace EventViewer.Models
         {
             var returnMessage = pretty ? JToken.Parse(this.Message).ToString() : this.Message;
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new ();
             sb.AppendLine($"-- Begin: {this.MessageId} at {DateTime.Now} -------- ");
             sb.AppendLine(string.Empty);
             sb.AppendLine($"  MessageId: {this.MessageId}");
